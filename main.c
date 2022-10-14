@@ -7,6 +7,7 @@
 void clear();
 void SetColor(int color);
 void clearArrayChar(char* array, int max_x, int val);
+void clearArray(int matriz[][6], int max_y, int val);
 void menu();
 
 int main(){
@@ -17,17 +18,17 @@ int main(){
 //funcion menu - control principal de programa
 void menu(){
     //variables
-    int opt=0;                                   //opcion elegida
+    int opt=3;                                   //opcion elegida
     int flagPrint=0;                             //bandera de impresion para evitar multiples impresiones
     int flag=1;                                  //flag de bucle - si es 0 se sale del juego
     char in;                                     //variable input del usuario
     char c[]={62,32,32,32};                      //array para la parte grafica del menu
-
+    int tablero[6][6];
     //programa
     while(flag){                                 //bucle principal - mantiene vivo el menu
         if(kbhit()){                             //si una tecla se presiono entonces se obtiene cual fue
             in = getch();
-            if(in=='w'){                         //si es w entonces se sube el "puntero" y opt se le suma 1                      
+            if(in=='w'){                         //si es w entonces se sube el "puntero" y opt se le suma 1
                 if(opt+1>3) opt=3;
                 else opt++;
             }
@@ -38,7 +39,8 @@ void menu(){
             if((int)in==13){                     //si es enter entonces se ingresa a esa opcion
                 switch(opt){
                     case 3:
-                        //funcion Nuevo Juego
+                        clearArray(tablero,6,0);
+                        menuNuevoJuego(tablero);
                         break;
                     case 2:
                         //funcion Continuar juego
@@ -75,7 +77,7 @@ void menu(){
             }
             flagPrint=0;
         }
-        
+
         if(flagPrint == 0){
             clear();
             printf("===== EL GATO MATEMATICO =====\n");
@@ -84,9 +86,81 @@ void menu(){
             printf("%c3. Estadisticas de partidas anteriores\n",c[2]);
             printf("%c4. salir\n",c[3]);
             if(!flag) printf("\nSaliendo del juego...");
-            flagPrint= 1; 
+            flagPrint= 1;
         }
     }
+    return ;
+}
+
+void menuNuevoJuego(int tablero[][6]){
+    int flag=0;
+    int flagScreen=0;
+    int x,y;
+    char in;
+    char jugador1[10];
+    char jugador2[10];
+    int tableroImp[][6]={{ 1, 2, 3, 4, 5, 6},
+                        { 7, 8, 9,10,12,14},
+                        {15,16,18,20,21,24},
+                        {25,27,28,30,32,35},
+                        {36,40,42,45,48,49},
+                        {54,56,63,64,72,81}};
+    int valores[]={1,1};
+    char punteros[] = {,32,32,32,32,32,32,32,32};
+    clear();
+    printf("====== Nuevo juego ======\n");
+    printf("ingrese nombre del primer jugador: ");
+    gets(&jugador1);
+    printf("ingrese nombre del segundo jugador: ");
+    gets(&jugador2);
+    printf("\naprete cualquier tecla para iniciar el juego");
+    while(!flag){
+        if(kbhit()){
+            flag=1;
+        }
+    }
+    while(flag){
+        if(kbhit()){
+            in=getch();
+            flagScreen=0;
+        }
+        if(!flagScreen){
+            clear();
+            for(y=0;y<6;y++){
+                printf("%c%c",9,9);
+                for(x=0;x<6;x++){
+                    switch(tablero[y][x]){
+                        case 1:
+                            SetColor(2); //verde
+                            break;
+                        case 2:
+                            SetColor(3); //celeste
+                            break;
+                        default:
+                            SetColor(7);
+                    }
+                    printf("%2i ",tableroImp[y][x]);
+                }
+                printf("\n");
+            }
+            for(y=0;y<9;y++){
+                printf("%i ",valores[y]);
+            }
+            printf("%c",94);
+            flagScreen=1;
+        }
+    }
+    return ;
+}
+
+void clearArray(int matriz[][6], int max_y, int val){
+    int x,y;
+    for(y=0;y<max_y;y++){
+        for(x=0;x<6;x++){
+            matriz[y][x]=val;
+        }
+    }
+
     return ;
 }
 
