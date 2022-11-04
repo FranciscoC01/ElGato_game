@@ -460,21 +460,21 @@ void traerPartida(){
     origen=fopen(partidas,"rb");
     fseek(origen,0,SEEK_END);
 
-    sz = ftell(origen);
-    nPartidas=sz/192;
-    char jugadores_list[2*(nPartidas)][10];
-    char c[nPartidas];
-    clearArrayChar(&c[0],nPartidas,32);
+    sz = ftell(origen);                //voy al final del archivo
+    nPartidas=sz/192;                  //me fijo la cantidad de partidas guardadas
+    char jugadores_list[2*(nPartidas)][10];  //declaro de forma dinamica la cantidad de partidas guardadas a mostrar
+    char c[nPartidas];                       //de la misma forma con el marcador que ayudara a elegir la partida
+    clearArrayChar(&c[0],nPartidas,32);      //limpio el array y lo inicializo en 32 "null"
     c[0]=62;
-    rewind(origen);
+    rewind(origen);                          //vuelvo al origen
 
-    for(i=0;i<nPartidas;i++){
+    for(i=0;i<nPartidas;i++){                //extraigo los nombres de los jugadores en cada partida
         fseek(origen,144, SEEK_CUR);
         fread(jugadores_list[i*2],sizeof(char[2][10]),1,origen);
         fseek(origen,28, SEEK_CUR);
     }
 
-    while(flag){
+    while(flag){                             //entro en un loop donde muestro los nombres de las partidas
         if(kbhit()){
             switch((int) getch()){
                 case 27: //esc
@@ -491,10 +491,10 @@ void traerPartida(){
                     else opt++;
                     break;
                 case 13: //enter
-                    fclose(origen);
-                    origen = fopen(partidas,"rb");
-                    destino = fopen(partidasTemp,"wb");
-                    fseek(origen,0,SEEK_END);
+                    fclose(origen);                 //cierro el puntero original al archivo
+                    origen = fopen(partidas,"rb");  //abro uno al archivo donde se guardan las partidas
+                    destino = fopen(partidasTemp,"wb"); //otro al archivo destino donde estaran todas las partidas por continuar menos la elegida
+                    fseek(origen,0,SEEK_END);       //calculo el tamaño del archivo
                     sz=ftell(origen);
                     rewind(origen);
 
@@ -502,7 +502,7 @@ void traerPartida(){
                     inf=192*opt;
 
 
-                    for(i=0;i<sz;i++){
+                    for(i=0;i<sz;i++){             //copio los datos al archivo destino a excepcion del bloque seleccionado
                         lug=ftell(origen);
                         if((lug<=sup)&&(lug>inf)){
                             fread(&dato,1,1,origen);
@@ -512,19 +512,19 @@ void traerPartida(){
                         }
                     }
 
-                    fseek(origen,inf,SEEK_SET);
+                    fseek(origen,inf,SEEK_SET);   //saco los datos de la partida elegida
                     fread(tablero,sizeof(tablero),1,origen);
                     fread(jugadores,sizeof(jugadores),1,origen);
                     fread(valores,sizeof(valores),1,origen);
                     fread(&turno,sizeof(int),1,origen);
 
-                    fclose(origen);
+                    fclose(origen);              //cierro los punteros
                     fclose(destino);
 
-                    system("rename data.dat dataDelet.dat");
-                    system("rename data.tmp data.dat");
-                    system("del dataDelet.dat");
-                    jugar(tablero,jugadores,valores,turno,1);
+                    system("rename data.dat dataDelet.dat");  //renombro el archivo origen
+                    system("rename data.tmp data.dat");       //renombro el archivo destino al nombre del archivo origen
+                    system("del dataDelet.dat");              //borro el archivo origen viejo
+                    jugar(tablero,jugadores,valores,turno,1); //entro a la partida
                     return ;
                     break;
             }
@@ -537,7 +537,7 @@ void traerPartida(){
         if(printScreen){
             system("cls");
             printf("====== Partidas a continuar ======\n");
-            for(i=0;i<nPartidas;i++){
+            for(i=0;i<nPartidas;i++){ //imprimo las partidas con el nombre de sus jugadores
                 printf("%c %i - %s vs %s \n",c[i],i+1,jugadores_list[(i*2)],jugadores_list[(i*2)+1]);
             }
             printScreen=0;
@@ -546,6 +546,7 @@ void traerPartida(){
     fclose(origen);
 }
 
+//funcion que muestra las partidas ganadas
 void tablaPartidas(){
     FILE* origen;
 
@@ -587,7 +588,6 @@ void tablaPartidas(){
     printf("\n(Para volver al menu aprete cualquier tecla)\n");
     while(!kbhit());
     fclose(origen);
-
 }
 
 /*
@@ -639,25 +639,25 @@ int gano(int tablero[][6],int x0,int y0){
     int i,b,x,y;
     int contador=0;
     int jugador=tablero[y0][x0];
-    for(i=0;i<4;i++){
+    for(i=0;i<4;i++){                 //reviso en un "cuadrado" de 5x5
         for(b=-2;b<3;b++){
             x=x0+(mult[i][0]*b);
             y=y0+(mult[i][1]*b);
-            if(dominio(x,y,0,5,0,5)){
-                if(contador<3){
-                    if(tablero[y][x]==jugador){
+            if(dominio(x,y,0,5,0,5)){ //si la coordenada esta en el dom
+                if(contador<3){       //y el contador es menor a 3, lo que quiere decir que no gano
+                    if(tablero[y][x]==jugador){  //reviso si esa coordenada esta marcada por el jugador
                         contador++;
                     }
-                    else{
+                    else{                        //en caso contrario reinicio el contador
                         contador=0;
                     }
                 }else{
-                    return 1;
+                    return 1;         //devuelvo 1 si gano
                 }
             }
         }
     }
-    return 0;
+    return 0;                         //devuelvo 0 si no paso nada
 }
 
 //funcion que revisa si se cumplen intervalos en x,y especificos
